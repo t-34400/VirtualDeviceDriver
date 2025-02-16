@@ -1,7 +1,12 @@
 {
   "driver_virtual_device_driver": {
-    "enable": false,
+    "enable": true,
     "loadPriority": 100,
-    "blocked_by_safe_mode": false,
+    "blocked_by_safe_mode": false
+  },
+  "virtual_device_driver_section" : {
+    "enable_hmd" : true,
+    "window_height" : 1080,
+    "window_width" : 1920
   }
 }
