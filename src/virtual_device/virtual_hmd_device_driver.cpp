@@ -6,6 +6,7 @@
 #include "driverlog.h"
 
 #include "driver_settings.h"
+#include "vr_math_utils.h"
 
 VirtualHMDDisplayComponent::VirtualHMDDisplayComponent(uint32_t width, uint32_t height)
     : window_width(width), window_height(height) 
@@ -39,30 +40,31 @@ void VirtualHMDDisplayComponent::GetRecommendedRenderTargetSize( uint32_t *pnWid
 
 void VirtualHMDDisplayComponent::GetEyeOutputViewport( vr::EVREye eEye, uint32_t *pnX, uint32_t *pnY, uint32_t *pnWidth, uint32_t *pnHeight )
 {
-    uint32_t half_window_width = window_width / 2;
-
     if (eEye == vr::Eye_Left)
     {
         *pnX = 0;
         *pnY = 0;
-        *pnWidth = half_window_width;
+        *pnWidth = window_width;
         *pnHeight = window_height;
     }
     else if (eEye == vr::Eye_Right)
     {
-        *pnX = half_window_width;
+        *pnX = window_width;
         *pnY = 0;
-        *pnWidth = half_window_width;
-        *pnHeight = window_height;
+        *pnWidth = 0;
+        *pnHeight = 0;
     }
 }
 
 void VirtualHMDDisplayComponent::GetProjectionRaw( vr::EVREye eEye, float *pfLeft, float *pfRight, float *pfTop, float *pfBottom )
 {
+    float aspectRatio = static_cast<float>(window_width) / static_cast<float>(window_height);
+
     *pfLeft = -1.0f;
     *pfRight = 1.0f;
-    *pfTop = -1.0f;
-    *pfBottom = 1.0f;        
+
+    *pfTop = -1.0f / aspectRatio;
+    *pfBottom = 1.0f / aspectRatio;
 }
 
 vr::DistortionCoordinates_t VirtualHMDDisplayComponent::ComputeDistortion( vr::EVREye eEye, float fU, float fV )
@@ -109,12 +111,24 @@ VirtualHMDDeviceDriver::VirtualHMDDeviceDriver()
 
 vr::EVRInitError VirtualHMDDeviceDriver::Activate( uint32_t unObjectId )
 {
+    device_index = unObjectId;
+
+    vr::PropertyContainerHandle_t container = vr::VRProperties()->TrackedDeviceToPropertyContainer( device_index );
+
+    vr::VRProperties()->SetFloatProperty( container, vr::Prop_DisplayFrequency_Float, 0.f );
+    vr::VRProperties()->SetFloatProperty( container, vr::Prop_UserHeadToEyeDepthMeters_Float, 0.f );
+    vr::VRProperties()->SetFloatProperty( container, vr::Prop_SecondsFromVsyncToPhotons_Float, 0.11f );
+	vr::VRProperties()->SetBoolProperty( container, vr::Prop_IsOnDesktop_Bool, false );
+	vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplayDebugMode_Bool, true);
+
     DriverLog("VirtualHMDDeviceDriver activated.");
     return vr::VRInitError_None;
 }
 
 void VirtualHMDDeviceDriver::Deactivate()
 {
+    device_index = vr::k_unTrackedDeviceIndexInvalid;
+
     DriverLog("VirtualHMDDeviceDriver deactivated.");
 }
 
@@ -141,7 +155,44 @@ void VirtualHMDDeviceDriver::DebugRequest( const char *pchRequest, char *pchResp
     }
 }
 
-vr::DriverPose_t VirtualHMDDeviceDriver::GetPose() // deprecated and not called
+vr::DriverPose_t VirtualHMDDeviceDriver::GetPose()
 {
-    return vr::DriverPose_t();
+    vr::DriverPose_t pose = { 0 };
+    VRMathUtils::GetPose(pose, position, rotation);
+
+	return pose;    
+}
+
+void VirtualHMDDeviceDriver::UpdatePose()
+{
+    bool updated = poseIsUpdate.exchange(false);
+
+    if (!updated)
+    {
+        return;
+    }
+
+    vr::VRServerDriverHost()->TrackedDevicePoseUpdated(device_index, GetPose(), sizeof(vr::DriverPose_t));
+}
+
+void VirtualHMDDeviceDriver::SetPosition(float x, float y, float z)
+{
+    position[0] = x;
+    position[1] = y;
+    position[2] = -z;
+
+    poseIsUpdate = true;
+}
+
+void VirtualHMDDeviceDriver::SetRotation(float x, float y, float z)
+{
+    double quat[4];
+    VRMathUtils::ToQuaternion(x, y, z, quat);
+
+    rotation[0] = quat[0];
+    rotation[1] = quat[1];
+    rotation[2] = quat[2];
+    rotation[3] = -quat[3];
+
+    poseIsUpdate = true;
 }

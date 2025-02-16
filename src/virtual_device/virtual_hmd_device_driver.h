@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <atomic>
 
 #include "openvr_driver.h"
 
@@ -27,7 +28,7 @@ public:
 
 private:
     uint32_t window_width;
-    uint32_t window_height; 
+    uint32_t window_height;
 };
 
 class VirtualHMDDeviceDriver : public vr::ITrackedDeviceServerDriver
@@ -44,8 +45,20 @@ public:
 
 	virtual void DebugRequest( const char *pchRequest, char *pchResponseBuffer, uint32_t unResponseBufferSize ) override;
 
-	virtual vr::DriverPose_t GetPose() override; // deprecated and not called
+	virtual vr::DriverPose_t GetPose() override;
+
+    void UpdatePose();
+
+    void SetPosition(float x, float y, float z);
+
+    void SetRotation(float x, float y, float z);
 
 private:
     std::unique_ptr<VirtualHMDDisplayComponent> display_component;
+    std::atomic< uint32_t > device_index;
+
+    std::atomic< bool > poseIsUpdate;
+
+    std::atomic< double > position[3] = {0.0, 1.0, 0.0};
+    std::atomic< double > rotation[4] = {0.0, 0.0, 0.0, 1.0};
 };
