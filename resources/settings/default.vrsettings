@@ -1,0 +1,7 @@
+{
+  "driver_virtual_device_driver": {
+    "enable": false,
+    "loadPriority": 100,
+    "blocked_by_safe_mode": false,
+  }
+}
