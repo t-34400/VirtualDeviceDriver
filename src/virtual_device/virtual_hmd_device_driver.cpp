@@ -115,6 +115,15 @@ vr::EVRInitError VirtualHMDDeviceDriver::Activate( uint32_t unObjectId )
 
     vr::PropertyContainerHandle_t container = vr::VRProperties()->TrackedDeviceToPropertyContainer( device_index );
 
+	char hmd_model_number[ 1024 ];
+	vr::VRSettings()->GetString( kDriverSettingsSection, "hmd_model_number", hmd_model_number, sizeof( hmd_model_number ) );
+	std::string hmd_model_number_ = hmd_model_number; 
+
+    vr::VRProperties()->SetStringProperty( container, vr::Prop_ModelNumber_String, hmd_model_number_.c_str() );
+
+	const float ipd = vr::VRSettings()->GetFloat( vr::k_pch_SteamVR_Section, vr::k_pch_SteamVR_IPD_Float );
+	vr::VRProperties()->SetFloatProperty( container, vr::Prop_UserIpdMeters_Float, ipd );
+
     vr::VRProperties()->SetFloatProperty( container, vr::Prop_DisplayFrequency_Float, 0.f );
     vr::VRProperties()->SetFloatProperty( container, vr::Prop_UserHeadToEyeDepthMeters_Float, 0.f );
     vr::VRProperties()->SetFloatProperty( container, vr::Prop_SecondsFromVsyncToPhotons_Float, 0.11f );

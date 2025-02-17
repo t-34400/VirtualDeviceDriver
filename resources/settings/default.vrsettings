@@ -8,6 +8,7 @@
     "osc_port" : 54300,
     "enable_hmd" : true,
     "hmd_serial" : "VirtualHMD",
+    "hmd_model_number" : "VirtualHMD_0",
     "enable_controllers" : true,
     "left_controller_serial" : "VirtualControllerLeft",
     "right_controller_serial" : "VirtualControllerRight",
