@@ -53,7 +53,7 @@ vr::DriverPose_t VirtualTrackingDeviceDriver::GetPose()
 	return pose;    
 }
 
-void VirtualTrackingDeviceDriver::UpdatePose()
+void VirtualTrackingDeviceDriver::Update()
 {
     bool updated = poseIsUpdate.exchange(false);
 

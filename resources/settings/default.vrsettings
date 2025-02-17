@@ -7,6 +7,7 @@
   "virtual_device_driver_section" : {
     "osc_port" : 54300,
     "enable_hmd" : true,
+    "enable_controllers" : true,
     "window_height" : 1080,
     "window_width" : 1920
   }

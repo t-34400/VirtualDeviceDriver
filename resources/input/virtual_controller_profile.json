@@ -1,0 +1,59 @@
+{
+    "jsonid": "input_profile",
+    "controller_type": "virtual_controller",
+    "input_bindingui_mode": "controller_handed",
+    "input_source": {
+      "/input/a": {
+        "type": "button",
+        "click": true,
+        "binding_image_point": [
+          80,
+          60
+        ],
+        "order": 1
+      },
+      "/input/b": {
+        "type": "button",
+        "click": true,
+        "binding_image_point": [
+          80,
+          60
+        ],
+        "order": 2
+      },
+      "/input/x": {
+        "type": "button",
+        "click": true,
+        "binding_image_point": [
+          80,
+          60
+        ],
+        "order": 3
+      },
+      "/input/grab": {
+        "type": "button",
+        "click": true,
+        "binding_image_point": [
+          80,
+          60
+        ],
+        "order": 4
+      },
+      "/input/trigger": {
+        "type": "trigger",
+        "binding_image_point": [
+          250,
+          60
+        ],
+        "order": 5
+      },
+      "/input/joystick": {
+        "type": "joystick",
+        "binding_image_point": [
+          60,
+          60
+        ],
+        "order": 6
+      }
+    }
+  }

@@ -21,7 +21,7 @@ public:
 
 	virtual vr::DriverPose_t GetPose() override;
 
-    void UpdatePose();
+    virtual void Update();
 
     void SetPosition(float x, float y, float z);
 

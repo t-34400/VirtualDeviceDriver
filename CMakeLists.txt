@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(virtual_device_driver)
 
+set(CMAKE_CXX_STANDARD 17)
+
 set(OPENVR_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/openvr/headers)
 set(OPENVR_LIB_DIR ${CMAKE_SOURCE_DIR}/openvr/lib)
 set(DRIVERLOG_DIR ${CMAKE_SOURCE_DIR}/openvr/samples/drivers/utils/driverlog)
