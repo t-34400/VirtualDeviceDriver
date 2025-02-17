@@ -1,5 +1,6 @@
 #include "device_provider.h"
 
+#include <algorithm>
 #include <string_view>
 
 #include "driverlog.h"
@@ -11,27 +12,49 @@ vr::EVRInitError VirtualDeviceProvider::Init( vr::IVRDriverContext *pDriverConte
 {
     VR_INIT_SERVER_DRIVER_CONTEXT( pDriverContext );
 
-    bool hmd_enabled = vr::VRSettings()->GetBool(kDriverSettingsSection, "enable_hmd");
+    char buffer[4096];
+
+    bool hmd_enabled = vr::VRSettings()->GetBool( kDriverSettingsSection, "enable_hmd" );
     if (hmd_enabled)
     {
-        m_pVirtualHmdDevice = new VirtualHMDDeviceDriver();
-        vr::VRServerDriverHost()->TrackedDeviceAdded( "VirtualHMD", vr::TrackedDeviceClass_HMD, m_pVirtualHmdDevice );    
+        vr::VRSettings()->GetString( kDriverSettingsSection, "hmd_serial", buffer, sizeof(buffer) );
+        std::string hmd_serial = buffer;
+
+        m_pVirtualHmdDevice = std::make_unique<VirtualHMDDeviceDriver>();
+        vr::VRServerDriverHost()->TrackedDeviceAdded( hmd_serial.c_str(), vr::TrackedDeviceClass_HMD, m_pVirtualHmdDevice.get() );
     }
-    bool controller_enabled = vr::VRSettings()->GetBool(kDriverSettingsSection, "enable_controllers");
+
+    bool controller_enabled = vr::VRSettings()->GetBool( kDriverSettingsSection, "enable_controllers" );
     if (controller_enabled)
     {
-        m_pVirtualLeftControllerDevice = new VirtualControllerDeviceDriver(vr::TrackedControllerRole_LeftHand);
-        vr::VRServerDriverHost()->TrackedDeviceAdded( "VirtualLeftController", vr::TrackedDeviceClass_Controller, m_pVirtualLeftControllerDevice );
+        vr::VRSettings()->GetString( kDriverSettingsSection, "left_controller_serial", buffer, sizeof(buffer) );
+        std::string left_controller_serial = buffer;
 
-        m_pVirtualRightControllerDevice = new VirtualControllerDeviceDriver(vr::TrackedControllerRole_RightHand);
-        vr::VRServerDriverHost()->TrackedDeviceAdded( "VirtualRightController", vr::TrackedDeviceClass_Controller, m_pVirtualRightControllerDevice );
+        m_pVirtualLeftControllerDevice = std::make_unique<VirtualControllerDeviceDriver>(vr::TrackedControllerRole_LeftHand);
+        vr::VRServerDriverHost()->TrackedDeviceAdded( left_controller_serial.c_str(), vr::TrackedDeviceClass_Controller, m_pVirtualLeftControllerDevice.get() );
+
+        vr::VRSettings()->GetString(kDriverSettingsSection, "right_controller_serial", buffer, sizeof(buffer));
+        std::string right_controller_serial = buffer;
+
+        m_pVirtualRightControllerDevice = std::make_unique<VirtualControllerDeviceDriver>(vr::TrackedControllerRole_RightHand);
+        vr::VRServerDriverHost()->TrackedDeviceAdded( right_controller_serial.c_str(), vr::TrackedDeviceClass_Controller, m_pVirtualRightControllerDevice.get() );
+    }
+
+    int32_t tracker_count = vr::VRSettings()->GetInt32( kDriverSettingsSection, "tracker_count" );
+    for (int idx = 0; idx < tracker_count; ++idx)
+    {
+        vr::VRSettings()->GetString( kDriverSettingsSection, ("tracker_" + std::to_string(idx) + "_serial").c_str(), buffer, sizeof(buffer) );
+        std::string tracker_serial = buffer;
+
+        m_pVirtualTrackingDevices.push_back(std::make_unique<VirtualTrackingDeviceDriver>());
+        vr::VRServerDriverHost()->TrackedDeviceAdded( tracker_serial.c_str(), vr::TrackedDeviceClass_GenericTracker, m_pVirtualTrackingDevices.back().get() );
     }
     
     DriverLog( "Virtual device initialized successfully." );
 
     uint32_t port = static_cast<uint32_t>(vr::VRSettings()->GetInt32(kDriverSettingsSection, "osc_port"));
 
-    m_pOSCReceiver = new OSCReceiver(port);
+    m_pOSCReceiver = std::make_unique<OSCReceiver>(port);
     m_pOSCReceiver->SetMessageCallback(std::bind(&VirtualDeviceProvider::OnOSCMessageReceived, this, std::placeholders::_1));
     m_pOSCReceiver->Start();
 
@@ -40,27 +63,12 @@ vr::EVRInitError VirtualDeviceProvider::Init( vr::IVRDriverContext *pDriverConte
 
 void VirtualDeviceProvider::Cleanup() 
 {
-    if (m_pVirtualHmdDevice)
-    {
-        delete m_pVirtualHmdDevice;
-        m_pVirtualHmdDevice = NULL;    
-    }
-
-    if (m_pVirtualLeftControllerDevice)
-    {
-        delete m_pVirtualLeftControllerDevice;
-        m_pVirtualLeftControllerDevice = NULL;
-    }
-
-    if (m_pVirtualRightControllerDevice)
-    {
-        delete m_pVirtualRightControllerDevice;
-        m_pVirtualRightControllerDevice = NULL;
-    }
+    m_pVirtualHmdDevice.reset();
+    m_pVirtualLeftControllerDevice.reset();
+    m_pVirtualRightControllerDevice.reset();
 
     m_pOSCReceiver->Stop();
-    delete m_pOSCReceiver;
-    m_pOSCReceiver = NULL;
+    m_pOSCReceiver.reset();
 
     DriverLog( "Virtual device cleanup completed." );
 }
@@ -80,6 +88,11 @@ void VirtualDeviceProvider::RunFrame()
     if (m_pVirtualRightControllerDevice)
     {
         m_pVirtualRightControllerDevice->Update();
+    }
+
+    for (auto& device : m_pVirtualTrackingDevices)
+    {
+        device->Update();
     }
 }
 
@@ -149,15 +162,25 @@ void VirtualDeviceProvider::OnOSCMessageReceived(const OSCParser::ParsedMessage&
 
 VirtualTrackingDeviceDriver* VirtualDeviceProvider::GetTrackingDevice(std::string_view segment)
 {
-    if (segment == "head") return m_pVirtualHmdDevice;
-    if (segment == "l_hand") return m_pVirtualLeftControllerDevice;
-    if (segment == "r_hand") return m_pVirtualRightControllerDevice;
+    if (segment == "head") return m_pVirtualHmdDevice.get();
+    if (segment == "l_hand") return m_pVirtualLeftControllerDevice.get();
+    if (segment == "r_hand") return m_pVirtualRightControllerDevice.get();
+
+    // Get tracker by index
+    if (!segment.empty() && std::all_of(segment.begin(), segment.end(), ::isdigit)) {
+        size_t index = std::stoi(std::string(segment)) - 1;
+
+        if (index >= 0 && index < m_pVirtualTrackingDevices.size()) {
+            return m_pVirtualTrackingDevices[index].get();
+        }
+    }
+
     return nullptr;
 }
 
 VirtualControllerDeviceDriver* VirtualDeviceProvider::GetControllerDevice(std::string_view segment)
 {
-    if (segment == "l_hand") return m_pVirtualLeftControllerDevice;
-    if (segment == "r_hand") return m_pVirtualRightControllerDevice;
+    if (segment == "l_hand") return m_pVirtualLeftControllerDevice.get();
+    if (segment == "r_hand") return m_pVirtualRightControllerDevice.get();
     return nullptr;
 }

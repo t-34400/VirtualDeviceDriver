@@ -7,8 +7,34 @@
   "virtual_device_driver_section" : {
     "osc_port" : 54300,
     "enable_hmd" : true,
+    "hmd_serial" : "VirtualHMD",
     "enable_controllers" : true,
+    "left_controller_serial" : "VirtualControllerLeft",
+    "right_controller_serial" : "VirtualControllerRight",
+    "tracker_count" : 10,
+    "tracker_0_serial" : "VirtualTracker_Hip",
+    "tracker_1_serial" : "VirtualTracker_Chest",
+    "tracker_2_serial" : "VirtualTracker_LeftFoot",
+    "tracker_3_serial" : "VirtualTracker_RightFoot",
+    "tracker_4_serial" : "VirtualTracker_LeftKnee",
+    "tracker_5_serial" : "VirtualTracker_RightKnee",
+    "tracker_6_serial" : "VirtualTracker_LeftElbow",
+    "tracker_7_serial" : "VirtualTracker_RightElbow",
+    "tracker_8_serial" : "VirtualTracker_LeftShoulder",
+    "tracker_9_serial" : "VirtualTracker_RightShoulder",
     "window_height" : 1080,
     "window_width" : 1920
+  },
+  "trackers" : {
+    "/devices/virtual_device_driver/VirtualTracker_Hip" : "TrackerRole_Waist",
+    "/devices/virtual_device_driver/VirtualTracker_Chest" : "TrackerRole_Chest",
+    "/devices/virtual_device_driver/VirtualTracker_LeftFoot" : "TrackerRole_LeftFoot",
+    "/devices/virtual_device_driver/VirtualTracker_RightFoot" : "TrackerRole_RightFoot",
+    "/devices/virtual_device_driver/VirtualTracker_LeftKnee" : "TrackerRole_LeftKnee",
+    "/devices/virtual_device_driver/VirtualTracker_RightKnee" : "TrackerRole_RightKnee",
+    "/devices/virtual_device_driver/VirtualTracker_LeftElbow" : "TrackerRole_LeftElbow",
+    "/devices/virtual_device_driver/VirtualTracker_RightElbow" : "TrackerRole_RightElbow",
+    "/devices/virtual_device_driver/VirtualTracker_LeftShoulder" : "TrackerRole_LeftShoulder",
+    "/devices/virtual_device_driver/VirtualTracker_RightShoulder" : "TrackerRole_RightShoulder"
   }
 }

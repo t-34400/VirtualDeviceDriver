@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <memory>
 #include <string_view>
 
 #include "openvr_driver.h"
@@ -25,11 +27,13 @@ public:
 	void Cleanup();
 
 private:
-    VirtualHMDDeviceDriver *m_pVirtualHmdDevice = nullptr;
-	VirtualControllerDeviceDriver *m_pVirtualLeftControllerDevice = nullptr;
-	VirtualControllerDeviceDriver *m_pVirtualRightControllerDevice = nullptr;
+    std::unique_ptr<VirtualHMDDeviceDriver> m_pVirtualHmdDevice = nullptr;
+	std::unique_ptr<VirtualControllerDeviceDriver> m_pVirtualLeftControllerDevice = nullptr;
+	std::unique_ptr<VirtualControllerDeviceDriver> m_pVirtualRightControllerDevice = nullptr;
 
-	OSCReceiver *m_pOSCReceiver = nullptr;
+	std::vector< std::unique_ptr<VirtualTrackingDeviceDriver> > m_pVirtualTrackingDevices;
+
+	std::unique_ptr<OSCReceiver> m_pOSCReceiver = nullptr;
 
 	void OnOSCMessageReceived(const OSCParser::ParsedMessage& msg);
 	VirtualTrackingDeviceDriver* GetTrackingDevice(std::string_view segment);
