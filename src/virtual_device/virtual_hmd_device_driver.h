@@ -5,6 +5,8 @@
 
 #include "openvr_driver.h"
 
+#include "virtual_tracking_device_driver.h"
+
 class VirtualHMDDisplayComponent : public vr::IVRDisplayComponent
 {
 public:
@@ -31,7 +33,7 @@ private:
     uint32_t window_height;
 };
 
-class VirtualHMDDeviceDriver : public vr::ITrackedDeviceServerDriver
+class VirtualHMDDeviceDriver : public VirtualTrackingDeviceDriver
 {
 public:
     VirtualHMDDeviceDriver();
@@ -43,22 +45,6 @@ public:
 
 	virtual void *GetComponent( const char *pchComponentNameAndVersion ) override;
 
-	virtual void DebugRequest( const char *pchRequest, char *pchResponseBuffer, uint32_t unResponseBufferSize ) override;
-
-	virtual vr::DriverPose_t GetPose() override;
-
-    void UpdatePose();
-
-    void SetPosition(float x, float y, float z);
-
-    void SetRotation(float x, float y, float z);
-
 private:
     std::unique_ptr<VirtualHMDDisplayComponent> display_component;
-    std::atomic< uint32_t > device_index;
-
-    std::atomic< bool > poseIsUpdate;
-
-    std::atomic< double > position[3] = {0.0, 1.0, 0.0};
-    std::atomic< double > rotation[4] = {0.0, 0.0, 0.0, 1.0};
 };
