@@ -25,7 +25,7 @@ vr::EVRInitError VirtualControllerDeviceDriver::Activate( uint32_t unObjectId )
     vr::VRDriverInput()->CreateBooleanComponent(container, "/input/a/click", &input_handles_[kInputHandle_A_click]);
     vr::VRDriverInput()->CreateBooleanComponent(container, "/input/b/click", &input_handles_[kInputHandle_B_click]);
     vr::VRDriverInput()->CreateBooleanComponent(container, "/input/x/click", &input_handles_[kInputHandle_X_click]);
-    vr::VRDriverInput()->CreateBooleanComponent(container, "/input/grab/click", &input_handles_[kInputHandle_grab_click]);
+    vr::VRDriverInput()->CreateBooleanComponent(container, "/input/grip/click", &input_handles_[kInputHandle_grip_click]);
 
 	vr::VRDriverInput()->CreateScalarComponent(container, "/input/trigger/value", &input_handles_[kInputHandle_trigger_value],
 		vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
@@ -60,7 +60,7 @@ void VirtualControllerDeviceDriver::Update()
         vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_A_click], a_button_pressed_, 0.0);
         vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_B_click], b_button_pressed_, 0.0);
         vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_X_click], x_button_pressed_, 0.0);
-        vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_grab_click], grab_button_pressed_, 0.0);
+        vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_grip_click], grip_button_pressed_, 0.0);
 
         vr::VRDriverInput()->UpdateScalarComponent(input_handles_[kInputHandle_trigger_value], trigger_value_, 0.0);
         vr::VRDriverInput()->UpdateScalarComponent(input_handles_[kInputHandle_joystick_x], joystick_x_, 0.0);

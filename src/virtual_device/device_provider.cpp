@@ -136,7 +136,7 @@ void VirtualDeviceProvider::OnOSCMessageReceived(const OSCParser::ParsedMessage&
         if (segment == "a") device->SetAButtonPressed(msg.booleanValue);
         else if (segment == "b") device->SetBButtonPressed(msg.booleanValue);
         else if (segment == "x") device->SetXButtonPressed(msg.booleanValue);
-        else if (segment == "grab") device->SetGrabButtonPressed(msg.booleanValue);
+        else if (segment == "grip") device->SetGripButtonPressed(msg.booleanValue);
         else if (segment == "trigger" && msg.floats.size() == 1) device->SetTriggerValue(msg.floats[0]);
         else if (segment == "joystick" && msg.floats.size() == 2)
         {

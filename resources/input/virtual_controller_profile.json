@@ -30,7 +30,7 @@
         ],
         "order": 3
       },
-      "/input/grab": {
+      "/input/grip": {
         "type": "button",
         "click": true,
         "binding_image_point": [
