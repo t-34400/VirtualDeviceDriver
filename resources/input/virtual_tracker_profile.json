@@ -1,0 +1,82 @@
+{
+  "jsonid": "input_profile",
+  "controller_type": "virtual_tracker",
+  "input_bindingui_mode" : "single_device",
+  "device_class": "TrackedDeviceClass_GenericTracker",
+  "remapping" : "{virtual_device_driver}/input/vive_tracker_remapping.json",
+  "driver_name" : "virtual_device_driver",
+  "should_show_binding_errors": true,
+  "input_source" :
+  {
+    "/input/power" : {
+        "type" : "button",
+				"order" :  1,
+        "binding_image_point" : [ 345, 128 ]
+    },
+    "/input/trigger" : {
+        "type" : "trigger",
+		"click" : true,
+		"value" : true,
+				"order" :  2,
+        "binding_image_point" : [ 127, 62 ]
+    },
+    "/input/grip" : {
+		"click": true,
+        "type" : "button",
+				"order" :  3,
+        "binding_image_point" : [ 210, 100 ]
+    },
+    "/input/application_menu" : {
+		"click": true,
+        "type" : "button",
+				"order" :  4,
+        "binding_image_point" : [ 210, 130 ]
+    },
+    "/input/thumb" : {
+		"click": true,
+        "type" : "button",
+				"order" :  5,
+        "binding_image_point" : [ 88, 148 ]
+    },
+    "/pose/raw" : {
+        "type" : "pose",
+        "binding_image_point" : [ 63, 148 ]
+    },
+    "/pose/front" : {
+        "type" : "pose",
+        "binding_image_point" : [ 100, 90 ]
+    },
+    "/pose/back" : {
+        "type" : "pose",
+        "binding_image_point" : [ 100, 90 ]
+    },
+    "/pose/pistol" : {
+        "type" : "pose",
+        "binding_image_point" : [ 100, 90 ]
+    },
+    "/pose/front_rolled" : {
+        "type" : "pose",
+        "binding_image_point" : [ 100, 90 ]
+    },
+    "/output/haptic" : {
+        "type" : "vibration",
+        "binding_image_point" : [ 66, 59 ]
+    }
+  },
+  "simulation_settings":
+  {
+	"hmd_profile": "vive",
+    "left_modelnumber": "VIVE Tracker Pro MV",
+    "right_modelnumber": "VIVE Tracker Pro MV",
+    "left_serialnumber": "LHR-00000003",
+    "right_serialnumber": "LHR-00000003",
+    "left_rendermodel": "{virtual_device_driver}vr_tracker_vive_1_0",
+    "right_rendermodel": "{virtual_device_driver}vr_tracker_vive_1_0",
+	"left_registered_device_type": "virtual_device_driver/vive_trackerLHR-00000003",
+	"right_registered_device_type": "virtual_device_driver/vive_trackerLHR-00000003",
+    "tracking_system_name": "lighthouse",
+    "manufacturer_name": "virtual_device_driver",
+	"legacy_buttons": [0, 1, 2, 32, 33],
+	"legacy_axis": [1, 3, 0, 0, 0]
+  }
+}

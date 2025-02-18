@@ -8,7 +8,8 @@
 class VirtualTrackingDeviceDriver : public vr::ITrackedDeviceServerDriver
 {
 public:
-    VirtualTrackingDeviceDriver();
+    VirtualTrackingDeviceDriver(std::string name = "");
+
 	virtual vr::EVRInitError Activate( uint32_t unObjectId ) override;
 
 	virtual void Deactivate() override;
@@ -31,6 +32,8 @@ protected:
     std::atomic< uint32_t > device_index;
 
 private:
+    std::string vive_tracker_name;
+
     std::atomic< bool > poseIsUpdate;
 
     std::atomic< double > position[3] = {0.0, 1.0, 0.0};

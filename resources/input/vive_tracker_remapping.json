@@ -1,0 +1,14 @@
+{
+  "to_controller_type" : "virtual_tracker",
+  "layouts" : [
+    {
+      "priority" : 100,
+      "from_controller_type" : "vive_tracker",
+      "simulate_controller_type" : true,
+      "simulate_render_model" : true,
+      "simulate_HMD" : false,
+      "autoremappings" : [
+      ]
+    }
+  ] 
+}

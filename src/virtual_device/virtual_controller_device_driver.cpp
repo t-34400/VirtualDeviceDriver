@@ -20,13 +20,16 @@ vr::EVRInitError VirtualControllerDeviceDriver::Activate( uint32_t unObjectId )
     vr::VRProperties()->SetInt32Property(container, vr::Prop_ControllerRoleHint_Int32, role_);
 
 	vr::VRProperties()->SetStringProperty(container, vr::Prop_InputProfilePath_String,
-		"{virtual_device_driver}/resources/input/virtual_controller_profile.json");
+		"{virtual_device_driver}/input/virtual_controller_profile.json");
 
     vr::VRDriverInput()->CreateBooleanComponent(container, "/input/a/click", &input_handles_[kInputHandle_A_click]);
     vr::VRDriverInput()->CreateBooleanComponent(container, "/input/b/click", &input_handles_[kInputHandle_B_click]);
     vr::VRDriverInput()->CreateBooleanComponent(container, "/input/x/click", &input_handles_[kInputHandle_X_click]);
-    vr::VRDriverInput()->CreateBooleanComponent(container, "/input/grip/click", &input_handles_[kInputHandle_grip_click]);
+    vr::VRDriverInput()->CreateBooleanComponent(container, "/input/y/click", &input_handles_[kInputHandle_Y_click]);
+    vr::VRDriverInput()->CreateBooleanComponent(container, "/input/system/click", &input_handles_[kInputHandle_System_click]);
 
+    vr::VRDriverInput()->CreateScalarComponent(container, "/input/grip/value", &input_handles_[kInputHandle_grip_value],
+    vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
 	vr::VRDriverInput()->CreateScalarComponent(container, "/input/trigger/value", &input_handles_[kInputHandle_trigger_value],
 		vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
 
@@ -60,8 +63,10 @@ void VirtualControllerDeviceDriver::Update()
         vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_A_click], a_button_pressed_, 0.0);
         vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_B_click], b_button_pressed_, 0.0);
         vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_X_click], x_button_pressed_, 0.0);
-        vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_grip_click], grip_button_pressed_, 0.0);
+        vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_Y_click], y_button_pressed_, 0.0);
+        vr::VRDriverInput()->UpdateBooleanComponent(input_handles_[kInputHandle_System_click], system_button_pressed_, 0.0);
 
+        vr::VRDriverInput()->UpdateScalarComponent(input_handles_[kInputHandle_grip_value], grip_value_, 0.0);
         vr::VRDriverInput()->UpdateScalarComponent(input_handles_[kInputHandle_trigger_value], trigger_value_, 0.0);
         vr::VRDriverInput()->UpdateScalarComponent(input_handles_[kInputHandle_joystick_x], joystick_x_, 0.0);
         vr::VRDriverInput()->UpdateScalarComponent(input_handles_[kInputHandle_joystick_y], joystick_y_, 0.0);

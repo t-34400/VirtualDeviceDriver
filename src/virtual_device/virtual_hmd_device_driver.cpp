@@ -121,6 +121,12 @@ vr::EVRInitError VirtualHMDDeviceDriver::Activate( uint32_t unObjectId )
 
     vr::VRProperties()->SetStringProperty( container, vr::Prop_ModelNumber_String, hmd_model_number_.c_str() );
 
+    char manufacturer_name[ 1024 ];
+    vr::VRSettings()->GetString( kDriverSettingsSection, "manufacturer_name", manufacturer_name, sizeof( manufacturer_name ) );
+    std::string manufacturer_name_ = manufacturer_name;
+
+    vr::VRProperties()->SetBoolProperty( container, vr::Prop_ManufacturerName_String, manufacturer_name_.c_str() );
+
 	const float ipd = vr::VRSettings()->GetFloat( vr::k_pch_SteamVR_Section, vr::k_pch_SteamVR_IPD_Float );
 	vr::VRProperties()->SetFloatProperty( container, vr::Prop_UserIpdMeters_Float, ipd );
 

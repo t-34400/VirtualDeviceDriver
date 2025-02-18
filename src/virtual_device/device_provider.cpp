@@ -1,12 +1,38 @@
 #include "device_provider.h"
 
 #include <algorithm>
+#include <iostream>
+#include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "driverlog.h"
 
 #include "driver_settings.h"
 #include "virtual_hmd_device_driver.h"
+
+
+std::string convertTrackerRoleToViveTracker(const std::string& trackerRole) {
+    static std::unordered_map<std::string, std::string> trackerMap = {
+        {"TrackerRole_Waist", "vive_tracker_waist"},
+        {"TrackerRole_Chest", "vive_tracker_chest"},
+        {"TrackerRole_LeftFoot", "vive_tracker_left_foot"},
+        {"TrackerRole_RightFoot", "vive_tracker_right_foot"},
+        {"TrackerRole_LeftKnee", "vive_tracker_left_knee"},
+        {"TrackerRole_RightKnee", "vive_tracker_right_knee"},
+        {"TrackerRole_LeftElbow", "vive_tracker_left_elbow"},
+        {"TrackerRole_RightElbow", "vive_tracker_right_elbow"},
+        {"TrackerRole_LeftShoulder", "vive_tracker_left_shoulder"},
+        {"TrackerRole_RightShoulder", "vive_tracker_right_shoulder"}
+    };
+
+    auto it = trackerMap.find(trackerRole);
+    if (it != trackerMap.end()) {
+        return it->second;
+    }
+
+    return "";
+}
 
 vr::EVRInitError VirtualDeviceProvider::Init( vr::IVRDriverContext *pDriverContext )
 {
@@ -46,7 +72,12 @@ vr::EVRInitError VirtualDeviceProvider::Init( vr::IVRDriverContext *pDriverConte
         vr::VRSettings()->GetString( kDriverSettingsSection, ("tracker_" + std::to_string(idx) + "_serial").c_str(), buffer, sizeof(buffer) );
         std::string tracker_serial = buffer;
 
-        m_pVirtualTrackingDevices.push_back(std::make_unique<VirtualTrackingDeviceDriver>());
+        vr::VRSettings()->GetString( vr::k_pch_Trackers_Section, tracker_serial.c_str(), buffer, sizeof(buffer) );
+        std::string tracker_role = buffer;
+
+        auto vive_tracker_type = convertTrackerRoleToViveTracker(tracker_role);
+
+        m_pVirtualTrackingDevices.push_back(std::make_unique<VirtualTrackingDeviceDriver>(vive_tracker_type));
         vr::VRServerDriverHost()->TrackedDeviceAdded( tracker_serial.c_str(), vr::TrackedDeviceClass_GenericTracker, m_pVirtualTrackingDevices.back().get() );
     }
     
@@ -149,7 +180,9 @@ void VirtualDeviceProvider::OnOSCMessageReceived(const OSCParser::ParsedMessage&
         if (segment == "a") device->SetAButtonPressed(msg.booleanValue);
         else if (segment == "b") device->SetBButtonPressed(msg.booleanValue);
         else if (segment == "x") device->SetXButtonPressed(msg.booleanValue);
-        else if (segment == "grip") device->SetGripButtonPressed(msg.booleanValue);
+        else if (segment == "y") device->SetYButtonPressed(msg.booleanValue);
+        else if (segment == "system") device->SetSystemButtonPressed(msg.booleanValue);
+        else if (segment == "grip" && msg.floats.size() == 1) device->SetGripValue(msg.floats[0]);
         else if (segment == "trigger" && msg.floats.size() == 1) device->SetTriggerValue(msg.floats[0]);
         else if (segment == "joystick" && msg.floats.size() == 2)
         {

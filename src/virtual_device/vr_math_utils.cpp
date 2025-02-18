@@ -36,5 +36,5 @@ void VRMathUtils::ToQuaternion(float pitch, float yaw, float roll, double* quat)
     quat[0] = -cy * cr * sp - sy * sr * cp;
     quat[1] = -sy * cr * cp + cy * sr * sp;
     quat[2] =  cy * sr * cp - sy * cr * sp;
-    quat[3] =  cy * cr * cp + sy * sr * sp;
+    quat[3] = -cy * cr * cp - sy * sr * sp;
 }

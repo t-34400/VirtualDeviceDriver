@@ -8,7 +8,7 @@
 #include "driver_settings.h"
 #include "vr_math_utils.h"
 
-VirtualTrackingDeviceDriver::VirtualTrackingDeviceDriver()
+VirtualTrackingDeviceDriver::VirtualTrackingDeviceDriver(std::string name) : vive_tracker_name(name)
 {
     DriverLog("VirtualTrackingDeviceDriver created.");
 }
@@ -16,6 +16,31 @@ VirtualTrackingDeviceDriver::VirtualTrackingDeviceDriver()
 vr::EVRInitError VirtualTrackingDeviceDriver::Activate( uint32_t unObjectId )
 {
     device_index = unObjectId;
+
+    vr::PropertyContainerHandle_t container = vr::VRProperties()->TrackedDeviceToPropertyContainer( device_index );
+
+	vr::VRProperties()->SetStringProperty(container, vr::Prop_InputProfilePath_String,
+		"{virtual_device_driver}/input/virtual_tracker_profile.json");
+
+    char model_number[ 1024 ];
+    vr::VRSettings()->GetString( kDriverSettingsSection, "tracker_model_number", model_number, sizeof( model_number ) );
+    std::string model_number_ = model_number; 
+
+    vr::VRProperties()->SetStringProperty( container, vr::Prop_ModelNumber_String, model_number_.c_str() );
+
+    if (!vive_tracker_name.empty())
+    {
+        vr::VRProperties()->SetStringProperty( container, vr::Prop_ControllerType_String, vive_tracker_name.c_str() );
+    }
+    
+    vr::ETrackedPropertyError err;
+    if (vr::VRProperties()->GetBoolProperty( container, vr::Prop_DeviceProvidesBatteryStatus_Bool, &err ) != true ) {
+        vr::VRProperties()->SetBoolProperty( container, vr::Prop_DeviceProvidesBatteryStatus_Bool, true );
+    }
+
+    vr::VRProperties()->SetFloatProperty( container, vr::Prop_DeviceBatteryPercentage_Float, 1 );
+
+    DriverLog("VirtualTrackerDeviceDriver activated.");
 
     return vr::VRInitError_None;
 }
